@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
   templateUrl: './buscar-conversacion.component.html',
   styleUrl: './buscar-conversacion.component.css'
 })
-export class BuscarConversacionComponent {
+export default class BuscarConversacionComponent {
   searchType: string = 'dni';
   searchValue: string = '';
 

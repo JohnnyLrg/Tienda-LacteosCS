@@ -24,7 +24,7 @@ export const routes: Routes = [
         title: 'Seleccionar Empresa'
     },
 
-    // Dashboard público de la empresa (catálogo de productos)
+    // Dashboard público de la empresa (catálogo de productos del sistema comercial)
     {
         path: 'tienda',
         loadComponent: () => import('./view/components/principal/principal.component'),

@@ -47,7 +47,7 @@ app.use('/api/company/:empresaCodigo/clientes', clientesRoutes);
 app.get('/api/health', (req, res) => {
     res.json({ 
         status: 'OK', 
-        message: 'Backend funcionando correctamente',
+        message: 'Sistema Comercial funcionando correctamente',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV
     });
@@ -87,7 +87,7 @@ app.use('*', (req, res) => {
 
 // Iniciar servidor
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor iniciado en puerto ${PORT}`);
+    console.log(`🚀 Sistema Comercial iniciado en puerto ${PORT}`);
     console.log(`🌍 Entorno: ${process.env.NODE_ENV}`);
     console.log(`📊 Base de datos: ${process.env.DB_SERVER}/${process.env.DB_NAME}`);
     console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);

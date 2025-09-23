@@ -1,6 +1,6 @@
-# 🥛 Sistema Multi-Tenant para Tienda de Lácteos - Backend
+# 🏢 Sistema Comercial Multi-Tenant - Backend
 
-Backend API desarrollado en Node.js + Express + SQL Server para el sistema multi-tenant de gestión de lácteos.
+Backend API desarrollado en Node.js + Express + SQL Server para el sistema comercial multi-tenant.
 
 ## 📋 Requisitos Previos
 
@@ -134,7 +134,7 @@ Respuesta esperada:
 ```json
 {
   "status": "OK",
-  "message": "Backend funcionando correctamente",
+  "message": "Sistema Comercial funcionando correctamente",
   "timestamp": "2025-09-22T...",
   "environment": "development"
 }
@@ -182,4 +182,4 @@ PORT=8081
 
 ---
 
-**¡El backend está listo para conectarse con tu base de datos SQL Server!** 🎉
+**¡El Sistema Comercial está listo para conectarse con tu base de datos SQL Server!** 🎉

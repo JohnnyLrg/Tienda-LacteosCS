@@ -7,7 +7,7 @@ import { HttpClientModule, provideHttpClient } from '@angular/common/http';
 // import { getAuth, provideAuth } from '@angular/fire/auth';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
-// Configuración de URLs para diferentes entornos
+// Configuración de URLs para diferentes entornos del Sistema Comercial
 // export const BASE_URL = 'http://192.168.0.100:8080/api'; // Para probar desde otros dispositivos en la red
 export const BASE_URL = 'http://localhost:8080/api'; // Para desarrollo local (recomendado)
 
@@ -16,7 +16,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     importProvidersFrom(HttpClientModule),
     
-    // Firebase - Comentado por ahora, se puede activar si se necesita
+    // Firebase - Comentado por ahora, se puede activar si se necesita para el Sistema Comercial
     // provideFirebaseApp(() =>
     //   initializeApp({
     //     projectId: 'loginlacteos',
