@@ -1,18 +1,22 @@
 export interface ClienteInfo {
-  ClienteDni: string;
+  ClienteCodigo: number;
+  ClienteIdentificacion: string | null;
   ClienteNombre: string;
-  ClienteApellidos: string;
-  ClienteDireccion: string;
-  ClienteTelefono: string;
-  ClienteEmail: string;
+  ClienteApellidos: string | null;
+  ClienteDireccion: string | null;
+  ClienteTelefono: string | null;
+  ClienteEmail: string | null;
+  ClienteFecha: Date;
+  ClienteEmpresaCodigo: number;
   Pedidos: Pedido[];
 }
 
 export interface Pedido {
   PedidoCodigo: number;
-  Pedidofecha: string;
-  Pedidototal: number;
-  PedidoEstado: string;
+  PedidoFecha: Date;
+  PedidoTotal: number;
+  PedidoEstado: 'Pendiente' | 'EnProceso' | 'Entregado' | 'Cancelado' | 'Devuelto';
+  PedidoEmpresaCodigo: number;
   Detalles: DetallePedido[];
 }
 
@@ -23,16 +27,20 @@ export interface DetallePedido {
   ProductoNombre: string;
   ProductoDescripcion: string;
   ProductoPrecio: number;
+  ProductoCodigo: number;
+  ProductoEmpresaCodigo: number;
 }
+
 export interface MostrarClientes {
   ClienteCodigo: number;
-  ClienteDni: string;
+  ClienteIdentificacion: string | null;
   ClienteNombre: string;
-  ClienteApellidos: string;
-  ClienteDireccion: string;
-  ClienteTelefono: string;
-  ClienteEmail: string;
-  ClienteFecha: string;
+  ClienteApellidos: string | null;
+  ClienteDireccion: string | null;
+  ClienteTelefono: string | null;
+  ClienteEmail: string | null;
+  ClienteFecha: Date;
+  ClienteEmpresaCodigo: number;
   CantidadPedidos: number;
   TotalCompras: number;
   ProductosComprados: string;

@@ -28,7 +28,7 @@ export class EmpleadosService {
   }
 
   removeEmpleado(email: string) {
-    this.empleadosList = this.empleadosList.filter(e => e.Empleadoemail !== email);
+    this.empleadosList = this.empleadosList.filter(e => e.EmpleadoEmail !== email);
     this.saveToLocalStorage(this.empleadosList);
     this.empleadosSubject.next(this.empleadosList);
   }

@@ -1,24 +1,31 @@
 export interface Empleado {
   EmpleadoCodigo: number;
-  Empleadonombre: string;
-  Empleadoapellidos: string;
-  Empleadoemail: string;
+  EmpleadoNombre: string;
+  EmpleadoApellidos: string;
+  EmpleadoEmail: string | null;
+  EmpleadoEmpresaCodigo: number;
 }
 
 export interface Mensaje {
-  mensajesId: number;
-  mensajesTexto: string;
-  user: number;
-  mensajestimestamp: string;
+  MensajesId: number;
+  MensajesClienteIdentificacion: string | null;
+  MensajesTexto: string;
+  EsUsuario: boolean; // 1 cliente / 0 empleado
+  Mensajestimestamp: Date;
+  MensajesCodigoEmpleado: number | null;
+  MensajesEmpresaCodigo: number;
+  MensajesEstado: string;
 }
 
 export interface ClienteConMensajes {
-  ClienteDNI: string;
+  ClienteIdentificacion: string;
   mensajes: Mensaje[];
+  EmpresaCodigo: number;
 }
 
 export interface ClienteConEmpleado {
-  ClienteDNI: string;
+  ClienteIdentificacion: string;
   Empleado: Empleado;
   Mensajes: Mensaje[];
+  EmpresaCodigo: number;
 }
