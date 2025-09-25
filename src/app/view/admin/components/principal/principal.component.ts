@@ -59,13 +59,13 @@ export default class PrincipalComponent implements OnInit {
 
 
   public iconItems = [
-    'lni lni-home',
-    'lni lni-dropbox',
-    'lni lni-network',
-    'lni lni-user',
-    'lni lni-pencil-alt',
-    'lni lni-users',
-    'lni lni-stats-down'
+    'las la-home',
+    'las la-boxes',
+    'las la-network-wired',
+    'las la-users',
+    'las la-edit',
+    'las la-user-friends',
+    'las la-chart-line'
   ];
 
   public combinedMenuItems: any[] = [];

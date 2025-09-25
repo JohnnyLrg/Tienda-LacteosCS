@@ -12,7 +12,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { CarritoServiceService } from '../../../controller/service/carrito/CarritoService.service';
 import { Productos } from '../../../model/interface/Productos';
-import { AuthService } from '../../../controller/service/autenticacionController/auth.service';
+import { CustomerAuthService } from '../../../controller/service/customer-auth.service';
 
 @Component({
   selector: 'app-nav-bar',
@@ -23,7 +23,7 @@ import { AuthService } from '../../../controller/service/autenticacionController
 })
 export class NavBarComponent implements OnInit {
   _carritoService = inject(CarritoServiceService);
-  _authService = inject(AuthService);
+  _customerAuthService = inject(CustomerAuthService);
 
   //ICONOS
   faUser = faUser;
@@ -42,7 +42,7 @@ export class NavBarComponent implements OnInit {
     });
 
     // Suscribirse al estado de autenticación
-    this._authService.user$.subscribe(user => {
+    this._customerAuthService.user$.subscribe(user => {
       this.currentUser = user;
       this.updateMenuItems(); // Actualizar menú cuando cambie el estado de auth
     });
@@ -99,7 +99,7 @@ export class NavBarComponent implements OnInit {
 
   async logout(): Promise<void> {
     try {
-      await this._authService.cerrarSesion();
+      await this._customerAuthService.logout();
       this._router.navigate(['/dashboard/home']);
     } catch (error) {
       console.error('Error al cerrar sesión:', error);

@@ -43,19 +43,17 @@
       </div>
 
       <div class="form-group">
-        <label for="dni">DNI *</label>
+        <label for="dni">DNI</label>
         <input 
           type="text" 
           id="dni" 
           formControlName="dni"
           placeholder="12345678"
           maxlength="8"
-          [class.error]="profileForm.get('dni')?.touched && profileForm.get('dni')?.errors"
+          readonly
+          class="readonly-input"
         />
-        <div class="error-messages">
-          <small *ngIf="profileForm.get('dni')?.errors?.['required']">El DNI es requerido</small>
-          <small *ngIf="profileForm.get('dni')?.errors?.['pattern']">Debe tener 8 dígitos</small>
-        </div>
+        <small class="info-text">El DNI no se puede modificar</small>
       </div>
 
       <div class="form-group">

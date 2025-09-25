@@ -73,7 +73,7 @@ export default class InventarioComponent implements OnInit {
       ProductoNombre: ['', [Validators.required, Validators.minLength(3)]],
       ProductoDescripcion: ['', Validators.required],
       ProductoPrecio: [0, [Validators.required, Validators.min(1)]],
-      ProductoCantidad: [0,  [Validators.required, Validators.min(1)]],
+      ProductoCantidad: [0, [Validators.required, Validators.min(0)]], // Permite 0 para agotado
       Producto_TipoProductoCodigo: [0, Validators.required],
       ProductoFoto: [null],
     });
@@ -250,7 +250,17 @@ export default class InventarioComponent implements OnInit {
       formData.append('ProductoNombre', this.editProductForm.get('ProductoNombre')?.value);
       formData.append('ProductoDescripcion', this.editProductForm.get('ProductoDescripcion')?.value);
       formData.append('ProductoPrecio', this.editProductForm.get('ProductoPrecio')?.value);
-      formData.append('ProductoCantidad', this.editProductForm.get('ProductoCantidad')?.value);
+      
+      // Lógica especial para ProductoCantidad: 0 = Agotado (null), >0 = Vigente
+      const cantidad = this.editProductForm.get('ProductoCantidad')?.value;
+      if (cantidad === 0 || cantidad === '0') {
+        formData.append('ProductoCantidad', 'null'); // Marca como agotado
+        console.log('📦 Producto marcado como AGOTADO (cantidad = null)');
+      } else {
+        formData.append('ProductoCantidad', cantidad.toString()); // Vigente
+        console.log(`📦 Producto marcado como VIGENTE (cantidad = ${cantidad})`);
+      }
+      
       formData.append('Producto_TipoProductoCodigo', this.editProductForm.get('Producto_TipoProductoCodigo')?.value);
       
       // Solo agregar imagen si se seleccionó una nueva

@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../../controller/service/autenticacionController/auth.service';
 import { CustomerIntegrationService } from '../../../../controller/service/customer-integration.service';
 
 @Component({
@@ -21,14 +20,13 @@ export class CustomerProfileComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
     private customerIntegration: CustomerIntegrationService,
     private router: Router
   ) {
     this.profileForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       apellido: ['', [Validators.required, Validators.minLength(2)]],
-      dni: ['', [Validators.required, Validators.pattern(/^[0-9]{8}$/)]],
+      dni: [{value: '', disabled: true}], // DNI es solo lectura, no se puede editar
       direccion: ['', [Validators.required, Validators.minLength(10)]],
       email: [{value: '', disabled: true}, [Validators.required, Validators.email]],
       telefono: ['', [Validators.required, Validators.pattern(/^[0-9]{9}$/)]]
@@ -42,7 +40,7 @@ export class CustomerProfileComponent implements OnInit {
   async loadUserProfile() {
     try {
       // Obtener usuario actual de Firebase
-      this.currentUser = await this.authService.getCurrentUser();
+      this.currentUser = this.customerIntegration.getCurrentUser();
       if (this.currentUser) {
         console.log('🔍 Cargando perfil completo desde BD...');
         
@@ -89,10 +87,10 @@ export class CustomerProfileComponent implements OnInit {
         console.log('🔄 Actualizando perfil completo...');
         
         // Asegurar que el email esté definido (usar el del usuario actual)
+        // No incluir DNI ya que no se puede editar
         const updateData = {
           nombre: formData.nombre.trim(),
           apellido: formData.apellido.trim(),
-          dni: formData.dni.trim(),
           direccion: formData.direccion.trim(),
           email: this.currentUser.email, // Usar el email del usuario actual, no del formulario
           telefono: formData.telefono.trim()
@@ -104,7 +102,7 @@ export class CustomerProfileComponent implements OnInit {
         await this.customerIntegration.updateCustomerProfile(this.currentUser.email, updateData);
         
         // Verificar que la sesión siga activa después de la actualización
-        const userStillLoggedIn = await this.authService.getCurrentUser();
+        const userStillLoggedIn = this.customerIntegration.getCurrentUser();
         if (!userStillLoggedIn) {
           console.error('⚠️ La sesión se cerró durante la actualización del perfil');
           this.showMessage('Error: La sesión se cerró. Por favor, inicia sesión nuevamente.', 'error');
@@ -131,7 +129,7 @@ export class CustomerProfileComponent implements OnInit {
   async changePassword() {
     if (this.currentUser?.email) {
       try {
-        await this.authService.sendPasswordResetEmail(this.currentUser.email);
+        await this.customerIntegration.sendPasswordResetEmail(this.currentUser.email);
         this.showMessage('Se ha enviado un email para cambiar tu contraseña', 'success');
       } catch (error: any) {
         console.error('Error sending password reset:', error);
@@ -142,7 +140,7 @@ export class CustomerProfileComponent implements OnInit {
 
   async logout() {
     try {
-      await this.authService.logout();
+      await this.customerIntegration.logout();
       this.router.navigate(['/']);
     } catch (error) {
       console.error('Error logging out:', error);

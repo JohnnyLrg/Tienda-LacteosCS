@@ -5,6 +5,7 @@ import { MostrarClientes } from '../../../../model/interface/cliente-info';
 import { ClientesService } from '../../../../controller/service/clientes.service';
 import { ClienteInfo } from '../../../../model/interface/cliente-info';
 import { ClienteInfoService } from '../../../../controller/service/pedidos/clienteInfo.service';
+import { ProductosService } from '../../../../controller/service/productos.service';
 import EnviosComponent from '../../../pages/envios/envios.component';
 
 @Component({
@@ -25,6 +26,7 @@ export default class ClientesComponent {
   dniBusqueda: string = '';
   clienteBuscado: ClienteInfo | null = null;
   mensajeBusqueda: string = '';
+  cargandoEstadisticas: boolean = false;
 
   activarBuscarClienteDni(){
     this.mostrarBuscarCliente = !this.mostrarBuscarCliente;
@@ -32,6 +34,7 @@ export default class ClientesComponent {
 
   private clienteInfoService = inject (ClienteInfoService);
   private clientesService = inject(ClientesService);
+  private productosService = inject(ProductosService);
   cdr = inject(ChangeDetectorRef);
   
   ngOnInit(): void {
@@ -42,7 +45,19 @@ export default class ClientesComponent {
     this.clienteInfoService.mostrarClientes().subscribe(
       (data) => {
         this.clientes = data;
-        console.log(this.clientes);
+        console.log('📋 Clientes cargados:', this.clientes);
+        
+        // Debug: verificar si las estadísticas ya vienen cargadas
+        if (this.clientes.length > 0) {
+          const primerCliente = this.clientes[0];
+          console.log('🔍 Primer cliente - estadísticas:', {
+            CantidadPedidos: primerCliente.CantidadPedidos,
+            TotalCompras: primerCliente.TotalCompras,
+            ProductosComprados: primerCliente.ProductosComprados,
+            CategoriasMasCompradas: primerCliente.CategoriasMasCompradas
+          });
+        }
+        
         this.cdr.markForCheck();
       },
       (error) => {
@@ -53,10 +68,37 @@ export default class ClientesComponent {
   }
 
   seleccionarCliente(cliente: MostrarClientes) {
+    console.log('=== CLIENTE SELECCIONADO ===');
+    console.log('Cliente completo:', cliente);
+    
     this.originalIndex = this.clientes.indexOf(cliente);
     this.clientes = this.clientes.filter(c => c !== cliente);
     this.clientes.unshift(cliente);
     this.selectedCliente = cliente;
+
+    // Verificar si ya tiene estadísticas cargadas
+    const tieneEstadisticas = (
+      cliente.CantidadPedidos !== null && 
+      cliente.CantidadPedidos !== undefined &&
+      cliente.CategoriasMasCompradas && 
+      cliente.CategoriasMasCompradas !== 'Sin datos'
+    );
+
+    console.log('🔍 ¿Cliente tiene estadísticas cargadas?', tieneEstadisticas);
+    console.log('📊 Estadísticas actuales:', {
+      CantidadPedidos: cliente.CantidadPedidos,
+      TotalCompras: cliente.TotalCompras,
+      ProductosComprados: cliente.ProductosComprados,
+      CategoriasMasCompradas: cliente.CategoriasMasCompradas
+    });
+
+    // Solo cargar estadísticas adicionales si no están disponibles
+    if (!tieneEstadisticas) {
+      console.log('⚡ Cargando estadísticas adicionales...');
+      this.cargarEstadisticasCliente(cliente);
+    } else {
+      console.log('✅ Usando estadísticas ya cargadas del backend');
+    }
 
     this.scrollToTop();
     this.cdr.markForCheck();
@@ -116,5 +158,149 @@ export default class ClientesComponent {
     this.clienteBuscado = null;
     this.mensajeBusqueda = '';
     this.cdr.markForCheck();
+  }
+
+  // Método para cargar estadísticas completas del cliente seleccionado
+  cargarEstadisticasCliente(cliente: MostrarClientes): void {
+    console.log('Cargando estadísticas para el cliente:', cliente.ClienteDni);
+    
+    this.cargandoEstadisticas = true;
+    this.cdr.markForCheck();
+    
+    // Usar el servicio de búsqueda por DNI para obtener información completa
+    this.clientesService.buscarClientePorDni(cliente.ClienteDni).subscribe({
+      next: (clienteCompleto: ClienteInfo) => {
+        console.log('=== INFORMACIÓN COMPLETA DEL CLIENTE ===');
+        console.log('Cliente:', clienteCompleto);
+        console.log('Pedidos:', clienteCompleto.Pedidos);
+        
+        // Actualizar las estadísticas basándose en los pedidos
+        if (clienteCompleto.Pedidos && clienteCompleto.Pedidos.length > 0) {
+          cliente.CantidadPedidos = clienteCompleto.Pedidos.length;
+          cliente.TotalCompras = clienteCompleto.Pedidos.reduce((total, pedido) => total + pedido.Pedidototal, 0);
+          
+          // Cargar productos con sus categorías reales desde la base de datos
+          this.productosService.cargarProductos().subscribe({
+            next: (productos) => {
+              console.log('📦 Productos cargados para análisis de categorías:', productos);
+              
+              const productosUnicos = new Set<string>();
+              const categoriasUnicas = new Set<string>();
+              
+              clienteCompleto.Pedidos.forEach(pedido => {
+                if (pedido.Detalles) {
+                  pedido.Detalles.forEach(detalle => {
+                    productosUnicos.add(detalle.ProductoNombre);
+                    
+                    // Buscar el producto en el catálogo para obtener su categoría real
+                    const producto = productos.find(p => 
+                      p.ProductoNombre.toLowerCase().trim() === detalle.ProductoNombre.toLowerCase().trim()
+                    );
+                    
+                    if (producto && producto.Producto_TipoProductoCodigo) {
+                      // Obtener la categoría real desde TipoProducto
+                      const categoriaReal = this.obtenerCategoriaRealDesdeProducto(producto);
+                      console.log(`📂 Categoría real para "${detalle.ProductoNombre}": ${categoriaReal}`);
+                      categoriasUnicas.add(categoriaReal);
+                    } else {
+                      console.log(`⚠️ Producto "${detalle.ProductoNombre}" no encontrado en catálogo actual`);
+                      // Fallback: usar inferencia por nombre solo si no se encuentra en BD
+                      const categoriaInferida = this.inferirCategoriaDelNombre(detalle.ProductoNombre);
+                      categoriasUnicas.add(categoriaInferida + ' (Agotado)');
+                    }
+                  });
+                }
+              });
+              
+              cliente.ProductosComprados = Array.from(productosUnicos).join(', ');
+              cliente.CategoriasMasCompradas = Array.from(categoriasUnicas).join(', ') || 'Sin categorías registradas';
+              
+              this.cargandoEstadisticas = false;
+              this.cdr.markForCheck();
+            },
+            error: (errorProductos) => {
+              console.error('Error al cargar productos:', errorProductos);
+              // Si no se pueden cargar productos, usar solo los datos básicos
+              cliente.ProductosComprados = clienteCompleto.Pedidos
+                .flatMap(p => p.Detalles?.map(d => d.ProductoNombre) || [])
+                .filter((v, i, a) => a.indexOf(v) === i)
+                .join(', ');
+              cliente.CategoriasMasCompradas = 'Error al cargar categorías';
+              
+              this.cargandoEstadisticas = false;
+              this.cdr.markForCheck();
+            }
+          });
+        } else {
+          cliente.CantidadPedidos = 0;
+          cliente.TotalCompras = 0;
+          cliente.ProductosComprados = 'Sin compras registradas';
+          cliente.CategoriasMasCompradas = 'Sin compras registradas';
+          this.cargandoEstadisticas = false;
+          this.cdr.markForCheck();
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar estadísticas del cliente:', error);
+        cliente.CantidadPedidos = 0;
+        cliente.TotalCompras = 0;
+        cliente.ProductosComprados = 'Error al cargar datos';
+        cliente.CategoriasMasCompradas = 'Error al cargar datos';
+        this.cargandoEstadisticas = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // Método para obtener la categoría real desde el producto de la base de datos
+  obtenerCategoriaRealDesdeProducto(producto: any): string {
+    // El producto debería tener información sobre su tipo/categoría
+    // Necesitamos verificar qué campo contiene la información de categoría
+    
+    console.log('🔍 Analizando estructura del producto:', producto);
+    
+    // Posibles campos donde puede estar la categoría:
+    if (producto.TipoProductoNombre) {
+      return producto.TipoProductoNombre; // Campo directo de categoría
+    }
+    
+    if (producto.Producto_TipoProductoCodigo) {
+      // Si solo tenemos el código, necesitaremos mapearlo
+      return this.mapearCodigoCategoria(producto.Producto_TipoProductoCodigo);
+    }
+    
+    // Si no encontramos la categoría en el producto, usar inferencia como fallback
+    return this.inferirCategoriaDelNombre(producto.ProductoNombre);
+  }
+
+  // Método para mapear códigos de categoría a nombres (necesario si solo tenemos el código)
+  mapearCodigoCategoria(codigo: number | string): string {
+    // Este mapeo debería basarse en los datos reales de tu tabla TipoProducto
+    const mapeo: { [key: string]: string } = {
+      '1': 'Lácteos',
+      '2': 'Bebidas',
+      '3': 'Snacks',
+      '4': 'Cuidado Personal',
+      '5': 'Cereales y Pastas',
+      // Agregar más mapeos según tu base de datos
+    };
+    
+    const codigoStr = String(codigo);
+    return mapeo[codigoStr] || `Categoría ${codigo}`;
+  }
+
+  // Método simple para inferir categoría del producto por nombre (solo fallback)
+  inferirCategoriaDelNombre(nombreProducto: string): string {
+    const nombre = nombreProducto.toLowerCase().trim();
+    
+    if (nombre.includes('leche') || nombre.includes('milk')) return 'Leches';
+    if (nombre.includes('queso') || nombre.includes('cheese')) return 'Quesos';
+    if (nombre.includes('yogur') || nombre.includes('yogurt')) return 'Yogures';
+    if (nombre.includes('galleta') || nombre.includes('oreo')) return 'Galletas y Snacks';
+    if (nombre.includes('bebida') || nombre.includes('inka') || nombre.includes('coca')) return 'Bebidas';
+    if (nombre.includes('shampoo') || nombre.includes('sedal')) return 'Cuidado Personal';
+    if (nombre.includes('pasta') || nombre.includes('espag') || nombre.includes('fideo')) return 'Pastas y Cereales';
+    
+    return 'Otros Productos';
   }
 }

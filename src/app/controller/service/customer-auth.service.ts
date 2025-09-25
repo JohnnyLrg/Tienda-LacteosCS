@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, User } from 'firebase/auth';
+import { getAuth, Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, User, sendPasswordResetEmail } from 'firebase/auth';
 import { getFirestore, doc, setDoc, getDoc, Firestore } from 'firebase/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { customerFirebaseConfig } from '../../customer-firebase.config';
@@ -77,6 +77,16 @@ export class CustomerAuthService {
       await signOut(this.customerAuth);
     } catch (error) {
       console.error('Error logout cliente:', error);
+      throw error;
+    }
+  }
+
+  // Enviar email de reset de contraseña
+  async sendPasswordResetEmail(email: string) {
+    try {
+      await sendPasswordResetEmail(this.customerAuth, email);
+    } catch (error) {
+      console.error('Error sending password reset email:', error);
       throw error;
     }
   }

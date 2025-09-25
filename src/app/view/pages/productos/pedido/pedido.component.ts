@@ -9,8 +9,8 @@ import { Router, RouterModule } from '@angular/router';
 import { ClienteInfoService } from '../../../../controller/service/pedidos/clienteInfo.service';
 import { ClienteInfo } from '../../../../model/interface/cliente-info';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { AuthService } from '../../../../controller/service/autenticacionController/auth.service';
 import { CustomerIntegrationService } from '../../../../controller/service/customer-integration.service';
+import { CustomerAuthService } from '../../../../controller/service/customer-auth.service';
 
 @Component({
   selector: 'app-pedido',
@@ -36,7 +36,7 @@ export default class PedidoComponent implements OnInit, AfterViewInit {
     private _routes: Router,
     private clienteInfoService: ClienteInfoService,
     private snackBar: MatSnackBar,
-    private authService: AuthService,
+    private customerAuthService: CustomerAuthService,
     private customerIntegrationService: CustomerIntegrationService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -47,7 +47,7 @@ export default class PedidoComponent implements OnInit, AfterViewInit {
     });
 
     // Suscribirse a cambios de autenticación en tiempo real
-    this.authService.user$.subscribe(async (user: any) => {
+    this.customerAuthService.user$.subscribe(async (user: any) => {
       console.log('🔄 Estado de autenticación cambió:', user);
       const previousUser = this.currentUser;
       this.currentUser = user;

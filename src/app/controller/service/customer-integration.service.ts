@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { AuthService } from './autenticacionController/auth.service';
+import { CustomerAuthService } from './customer-auth.service';
 import { ClientesService } from './clientes.service';
 import { ClienteInfo } from '../../model/interface/cliente-info';
 import { BASE_URL } from '../../app.config';
@@ -28,20 +28,25 @@ export interface CustomerProfileData {
 })
 export class CustomerIntegrationService {
 
-  private authService = inject(AuthService);
+  private customerAuthService = inject(CustomerAuthService);
   private clientesService = inject(ClientesService);
 
   /**
    * Verificar duplicados antes del registro
    */
   async checkDuplicates(email: string, dni?: string, excludeCode?: number): Promise<void> {
-    console.log('🔍 Verificando duplicados...');
+    console.log('🔍 Verificando duplicados...', excludeCode ? `(excluyendo código: ${excludeCode})` : '');
     
     // Verificar email duplicado
     try {
       const clienteConEmail = await this.clientesService.buscarClientePorEmail(email).toPromise();
-      if (clienteConEmail && (!excludeCode || clienteConEmail.ClienteCodigo !== excludeCode)) {
-        throw new Error('Ya existe un cliente registrado con este email');
+      if (clienteConEmail) {
+        // Si hay un código para excluir, verificar que no sea el mismo cliente
+        if (excludeCode && clienteConEmail.ClienteCodigo === excludeCode) {
+          console.log('ℹ️ Email pertenece al mismo cliente, permitido');
+        } else {
+          throw new Error('Ya existe un cliente registrado con este email');
+        }
       }
     } catch (error: any) {
       if (error.status !== 404 && !error.message.includes('Ya existe un cliente')) {
@@ -54,16 +59,29 @@ export class CustomerIntegrationService {
     
     // Verificar DNI duplicado
     if (dni && dni.length >= 8) {
+      console.log(`🔍 Verificando DNI: ${dni} (excluir código: ${excludeCode})`);
       try {
         const clienteConDni = await this.clientesService.buscarClientePorDni(dni).toPromise();
-        if (clienteConDni && (!excludeCode || clienteConDni.ClienteCodigo !== excludeCode)) {
-          throw new Error('Ya existe un cliente registrado con este DNI');
+        if (clienteConDni) {
+          console.log('📋 Cliente encontrado con DNI:', clienteConDni);
+          // Si hay un código para excluir, verificar que no sea el mismo cliente
+          if (excludeCode && clienteConDni.ClienteCodigo === excludeCode) {
+            console.log('ℹ️ DNI pertenece al mismo cliente, permitido');
+          } else {
+            console.log(`❌ DNI duplicado: cliente ${clienteConDni.ClienteCodigo} vs excluir ${excludeCode}`);
+            throw new Error('Ya existe un cliente registrado con este DNI');
+          }
+        } else {
+          console.log('✅ DNI disponible');
         }
       } catch (error: any) {
-        if (error.status !== 404 && !error.message.includes('Ya existe un cliente')) {
+        if (error.status === 404) {
+          console.log('✅ DNI no encontrado (404), está disponible');
+        } else if (error.message && error.message.includes('Ya existe un cliente')) {
+          console.log('❌ Relanzando error de DNI duplicado');
           throw error;
-        }
-        if (error.message.includes('Ya existe un cliente')) {
+        } else {
+          console.log('❌ Error inesperado verificando DNI:', error);
           throw error;
         }
       }
@@ -84,12 +102,14 @@ export class CustomerIntegrationService {
       
       // 1. Crear usuario en Firebase
       console.log('📧 Creando usuario en Firebase...');
-      const firebaseUser = await this.authService.registrarse({
-        UsurioNombre: data.nombre,
-        Usuariocorreo_electronico: data.email,
-        Usuariocontrasena: data.password,
-        UsuarioTelefono: data.telefono
-      });
+      const firebaseUser = await this.customerAuthService.registerCustomer(
+        data.email,
+        data.password,
+        {
+          nombre: data.nombre,
+          telefono: data.telefono
+        }
+      );
 
       console.log('✅ Usuario creado en Firebase:', firebaseUser.user?.uid);
 
@@ -117,7 +137,7 @@ export class CustomerIntegrationService {
       // 3. Guardar datos adicionales en Firestore (opcional, para sincronización)
       if (firebaseUser.user) {
         console.log('🔄 Sincronizando con Firestore...');
-        await this.authService.updateUserProfile(firebaseUser.user.uid, {
+        await this.customerAuthService.updateCustomerProfile(firebaseUser.user.uid, {
           nombre: data.nombre,
           apellido: data.apellido,
           telefono: data.telefono,
@@ -197,7 +217,14 @@ export class CustomerIntegrationService {
       // Solo verificar duplicados si tenemos conectividad con la BD
       if (clienteActual !== null) {
         try {
-          await this.checkDuplicates(data.email, data.dni, clienteActual?.ClienteCodigo);
+          // Solo verificar email, el DNI no se puede cambiar en el perfil
+          const excludeCode = clienteActual.ClienteCodigo;
+          if (excludeCode) {
+            await this.checkDuplicates(data.email, undefined, excludeCode);
+          } else {
+            console.warn('⚠️ Cliente actual sin código, verificando duplicados sin exclusión');
+            await this.checkDuplicates(data.email);
+          }
         } catch (error: any) {
           // Si hay error de duplicados, es importante lanzarlo
           if (error.message && error.message.includes('Ya existe un cliente')) {
@@ -211,7 +238,7 @@ export class CustomerIntegrationService {
       }
       
       // 1. Actualizar en Firebase (solo para sincronización)
-      const currentUser = await this.authService.getCurrentUser();
+      const currentUser = this.customerAuthService.getCurrentUser();
       if (currentUser) {
         console.log('🔄 Actualizando Firebase...');
         
@@ -227,7 +254,7 @@ export class CustomerIntegrationService {
         
         console.log('📋 Datos para Firebase:', firebaseData);
         try {
-          await this.authService.updateUserProfile(currentUser.uid, firebaseData);
+          await this.customerAuthService.updateCustomerProfile(currentUser.uid, firebaseData);
           console.log('✅ Firebase actualizado');
         } catch (error: any) {
           console.warn('⚠️ Error actualizando Firebase, continuando:', error);
@@ -306,7 +333,7 @@ export class CustomerIntegrationService {
       console.log('🔄 Sincronizando usuario Firebase con BD...');
       
       // Obtener datos del usuario actual de Firebase
-      const currentUser = await this.authService.getCurrentUser();
+      const currentUser = this.customerAuthService.getCurrentUser();
       if (!currentUser || currentUser.email !== email) {
         throw new Error('Usuario no autenticado o email no coincide');
       }
@@ -355,10 +382,7 @@ export class CustomerIntegrationService {
       console.log('🔑 Iniciando login para:', email);
       
       // 1. Login en Firebase
-      const firebaseUser = await this.authService.logearse({
-        Usuariocorreo_electronico: email,
-        Usuariocontrasena: password
-      });
+      const firebaseUser = await this.customerAuthService.loginCustomer(email, password);
       console.log('✅ Login exitoso en Firebase');
 
       // 2. Obtener datos completos de la BD
@@ -381,6 +405,48 @@ export class CustomerIntegrationService {
       return { firebaseUser, clienteInfo };
     } catch (error) {
       console.error('❌ Error en login completo:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Cerrar sesión del cliente
+   */
+  async logout(): Promise<void> {
+    try {
+      console.log('🔓 Cerrando sesión de cliente...');
+      await this.customerAuthService.logout();
+      console.log('✅ Sesión cerrada correctamente');
+    } catch (error) {
+      console.error('❌ Error cerrando sesión:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtener usuario actual autenticado
+   */
+  getCurrentUser() {
+    return this.customerAuthService.getCurrentUser();
+  }
+
+  /**
+   * Observable del estado de autenticación
+   */
+  get user$() {
+    return this.customerAuthService.user$;
+  }
+
+  /**
+   * Enviar email de reset de contraseña
+   */
+  async sendPasswordResetEmail(email: string): Promise<void> {
+    try {
+      console.log('📧 Enviando email de reset de contraseña...');
+      await this.customerAuthService.sendPasswordResetEmail(email);
+      console.log('✅ Email enviado correctamente');
+    } catch (error) {
+      console.error('❌ Error enviando email de reset:', error);
       throw error;
     }
   }

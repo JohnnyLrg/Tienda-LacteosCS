@@ -40,10 +40,19 @@
                     <h3>Estadísticas de {{ selectedCliente.ClienteNombre }} {{ selectedCliente.ClienteApellidos }}</h3>
                     <p><strong>Historial de compras:</strong></p>
     
-                    <p>Cantidad de pedidos: {{selectedCliente.CantidadPedidos}}</p>
-                    <p>Categorias Compradas:{{selectedCliente.CategoriasMasCompradas}}</p>
-                    <p>Productos Comprados: {{selectedCliente.ProductosComprados}}</p>
-                    <p>Total de compras: ${{selectedCliente.TotalCompras}}</p>
+                    @if (cargandoEstadisticas) {
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando estadísticas...</span>
+                            </div>
+                            <p class="mt-2">Cargando estadísticas completas...</p>
+                        </div>
+                    } @else {
+                        <p>Cantidad de pedidos: {{selectedCliente.CantidadPedidos || 'Sin datos'}}</p>
+                        <p>Categorías Compradas: {{selectedCliente.CategoriasMasCompradas || 'Sin datos'}}</p>
+                        <p>Productos Comprados: {{selectedCliente.ProductosComprados || 'Sin datos'}}</p>
+                        <p>Total de compras: ${{selectedCliente.TotalCompras || 0}}</p>
+                    }
                 </div>
             </div>
         </div>
