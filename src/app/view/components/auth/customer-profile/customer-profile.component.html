@@ -1,0 +1,123 @@
+<div class="profile-container">
+  <div class="profile-card">
+    <div class="profile-header">
+      <button class="back-button" (click)="goBack()">
+        <span>←</span>
+      </button>
+      <h2>Mi Perfil</h2>
+    </div>
+
+    <div *ngIf="message" class="message" [ngClass]="messageType">
+      {{ message }}
+    </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="nombre">Nombre *</label>
+        <input 
+          type="text" 
+          id="nombre" 
+          formControlName="nombre"
+          placeholder="Ingresa tu nombre"
+          [class.error]="profileForm.get('nombre')?.touched && profileForm.get('nombre')?.errors"
+        />
+        <div class="error-messages">
+          <small *ngIf="profileForm.get('nombre')?.errors?.['required']">El nombre es requerido</small>
+          <small *ngIf="profileForm.get('nombre')?.errors?.['minlength']">Debe tener al menos 2 caracteres</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="apellido">Apellido *</label>
+        <input 
+          type="text" 
+          id="apellido" 
+          formControlName="apellido"
+          placeholder="Ingresa tu apellido"
+          [class.error]="profileForm.get('apellido')?.touched && profileForm.get('apellido')?.errors"
+        />
+        <div class="error-messages">
+          <small *ngIf="profileForm.get('apellido')?.errors?.['required']">El apellido es requerido</small>
+          <small *ngIf="profileForm.get('apellido')?.errors?.['minlength']">Debe tener al menos 2 caracteres</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="dni">DNI *</label>
+        <input 
+          type="text" 
+          id="dni" 
+          formControlName="dni"
+          placeholder="12345678"
+          maxlength="8"
+          [class.error]="profileForm.get('dni')?.touched && profileForm.get('dni')?.errors"
+        />
+        <div class="error-messages">
+          <small *ngIf="profileForm.get('dni')?.errors?.['required']">El DNI es requerido</small>
+          <small *ngIf="profileForm.get('dni')?.errors?.['pattern']">Debe tener 8 dígitos</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="direccion">Dirección *</label>
+        <input 
+          type="text" 
+          id="direccion" 
+          formControlName="direccion"
+          placeholder="Av. Ejemplo 123, Lima"
+          [class.error]="profileForm.get('direccion')?.touched && profileForm.get('direccion')?.errors"
+        />
+        <div class="error-messages">
+          <small *ngIf="profileForm.get('direccion')?.errors?.['required']">La dirección es requerida</small>
+          <small *ngIf="profileForm.get('direccion')?.errors?.['minlength']">Debe tener al menos 10 caracteres</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email"
+          placeholder="correo@ejemplo.com"
+          readonly
+          class="readonly-input"
+        />
+        <small class="info-text">El email no se puede cambiar</small>
+      </div>
+
+      <div class="form-group">
+        <label for="telefono">Teléfono *</label>
+        <input 
+          type="tel" 
+          id="telefono" 
+          formControlName="telefono"
+          placeholder="123456789"
+          maxlength="9"
+          [class.error]="profileForm.get('telefono')?.touched && profileForm.get('telefono')?.errors"
+        />
+        <div class="error-messages">
+          <small *ngIf="profileForm.get('telefono')?.errors?.['required']">El teléfono es requerido</small>
+          <small *ngIf="profileForm.get('telefono')?.errors?.['pattern']">Debe tener 9 dígitos</small>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="btn-primary"
+          [disabled]="!profileForm.valid || loading"
+        >
+          <span *ngIf="loading">Guardando...</span>
+          <span *ngIf="!loading">Guardar Cambios</span>
+        </button>
+      </div>
+    </form>
+
+    <div class="additional-actions">
+      <button class="btn-secondary" (click)="changePassword()">
+        Cambiar Contraseña
+      </button>
+    </div>
+  </div>
+</div>

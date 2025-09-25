@@ -12,7 +12,7 @@
                 <!-- logo -->
                 <div class="logo" (click)="redirectToPantallaCarga() " style="cursor: pointer;">
                     <img src="../../../../assets/logoEmpresa.png" alt="" style="height: 50px;" class="me-3">
-                    <a class="navbar-brand text-uppercase fs-3 d-none d-lg-block">san Jose</a>
+                    <a class="navbar-brand text-uppercase fs-3 d-none d-lg-block">Sistema Comercial</a>
                 </div>
             </div>
 
@@ -21,7 +21,7 @@
                 aria-labelledby="offcanvasNavbarLabel">
                 <!-- sideBar Header -->
                 <div class="offcanvas-header text-white border-bottom">
-                    <h5 class="offcanvas-title" id="offcanvasNavbarLabel">San Jose de Porcón</h5>
+                    <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Sistema Comercial</h5>
                     <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas"
                         aria-label="Close"></button>
                 </div>
@@ -30,7 +30,7 @@
                     <ul class="navbar-nav justify-content-lg-end flex-grow-1 pe-3">
                         @for (item of menuItems; track $index) {
                         <li class=" mx-2 my-3 my-lg-0" style="cursor: pointer;">
-                            <a [routerLink]="item.path" routerLinkActive="active">
+                            <a [routerLink]="'/dashboard/' + item.path" routerLinkActive="active">
                                 {{item.title}}</a>
                         </li>
                         }
@@ -39,11 +39,33 @@
                 </div>
             </div>
             <div class="iconos">
-                <!-- <a><fa-icon [icon]="faHeart"></fa-icon> </a> -->
-                <!-- <a routerLink="/login"><fa-icon [icon]="faUser"></fa-icon></a> -->
-                <!-- shop -->
-                <!-- <a class="" data-bs-toggle="offcanvas" data-bs-target="#offcanvasShop" role="button"
-                    aria-controls="offcanvasShop"><fa-icon [icon]="faCartShopping"></fa-icon></a> -->
+                <!-- Usuario no logueado -->
+                @if (!currentUser) {
+                    <button class="btn btn-outline-primary btn-sm me-2" (click)="goToLogin()">
+                        Iniciar Sesión
+                    </button>
+                    <button class="btn btn-primary btn-sm me-2" (click)="goToRegister()">
+                        Registrarse
+                    </button>
+                }
+                
+                <!-- Usuario logueado -->
+                @if (currentUser) {
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <fa-icon [icon]="faUser"></fa-icon>
+                            {{ currentUser.email }}
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" routerLink="/customer-profile">Mi Perfil</a></li>
+                            <li><a class="dropdown-item" routerLink="/dashboard/envios">Mis Pedidos</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item" (click)="logout()">Cerrar Sesión</button></li>
+                        </ul>
+                    </div>
+                }
+
+                <!-- Carrito -->
                 <a type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasShop" role="button"
                     aria-controls="offcanvasShop" class=" position-relative">
                     <fa-icon [icon]="faCartShopping"></fa-icon>
@@ -93,7 +115,7 @@
                 <h5 style="margin-right: 50px;" class="offcanvas-title" id="offcanvasExampleLabel"> Total: </h5>
                 <h5 style="margin-bottom: 0;">S/. {{calcularTotal()}} </h5>
             </div>
-            <button *ngIf="productosCarrito.length > 0" routerLink="/pedido" class="Boton-Comprar " type="button"
+            <button *ngIf="productosCarrito.length > 0" (click)="proceedToCheckout()" class="Boton-Comprar " type="button"
                 data-bs-dismiss="offcanvas">Comprar</button>
         </div>
     </div>

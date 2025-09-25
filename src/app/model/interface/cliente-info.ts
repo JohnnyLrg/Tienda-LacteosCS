@@ -1,4 +1,5 @@
 export interface ClienteInfo {
+  ClienteCodigo?: number;
   ClienteDni: string;
   ClienteNombre: string;
   ClienteApellidos: string;

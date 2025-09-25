@@ -18,6 +18,14 @@ export class InventarioService {
     return this.http.get<Inventario[]>(`${BASE_URL}/products/productosMostrar`);
   }
 
+  // NUEVO: Método para cargar inventario admin con filtro de estado
+  cargarInventarioAdmin(estado?: string): Observable<Inventario[]> {
+    const url = estado 
+      ? `${BASE_URL}/products/inventario-admin?estado=${estado}`
+      : `${BASE_URL}/products/inventario-admin`;
+    return this.http.get<Inventario[]>(url);
+  }
+
   actualizarInventario(): void {
     this.cargarInventario().subscribe(
       (data) => {
@@ -30,13 +38,26 @@ export class InventarioService {
     );
   }
 
+  // NUEVO: Actualizar inventario admin con estado específico
+  actualizarInventarioAdmin(estado?: string): void {
+    this.cargarInventarioAdmin(estado).subscribe(
+      (data) => {
+        console.log('datos obtenidos del inventario admin:', data);
+        this.inventario.next(data);
+      },
+      (error) => {
+        console.error('Error al cargar inventario admin:', error);
+      }
+    );
+  }
+
   obtenerInventario(): Observable<Inventario[]> {
     return this.inventario.asObservable();
   }
 
-  // Este endpoint necesitará ser implementado en el backend si no existe
-  modificarInventario(formData: FormData): Observable<any> {
-    return this.http.put(`${BASE_URL}/products/actualizarProducto`, formData);
+  // Método corregido para actualizar producto con ID
+  modificarInventario(productoCodigo: number, formData: FormData): Observable<any> {
+    return this.http.put(`${BASE_URL}/products/actualizarProducto/${productoCodigo}`, formData);
   }
 
   // Este endpoint ya existe en el backend

@@ -5,27 +5,17 @@
                 <i class="lni lni-grid-alt"></i>
             </button>
             <div class="sidebar-logo">
-                <a routerLink="/EmpresaAdmin/home">Tienda De Lacteos</a>
+                <a routerLink="/EmpresaAdmin/home">Sistema Comercial</a>
             </div>
         </div>
         <ul class="sidebar-nav">
             @for (item of combinedMenuItems; track $index) {
             <li class="sidebar-item" style="cursor: pointer;">
-                <a class="sidebar-link d-flex align-items-center"
-                    (click)="item.title === 'Conversaciones' ? toggleConversaciones() : null" [routerLink]="item.path"
+                <a class="sidebar-link d-flex align-items-center" [routerLink]="item.path"
                     routerLinkActive="active">
                     <i class="{{item.icon}}"></i>
                     <span>{{item.title}}</span>
-
                 </a>
-                <ul *ngIf="isConversacionesExpanded && item.title === 'Conversaciones'" class="sidebar-dropdown">
-                    <li *ngFor="let subItem of subMenuConversaciones; let j = index" class="sidebar-item">
-                        <a class="sidebar-link"
-                            [routerLink]="['/Empresa/conversaciones-gestor', subItem.path]" routerLinkActive="active">
-                            {{subItem.title}}
-                        </a>
-                    </li>
-                </ul>
             </li>
             }
         </ul>

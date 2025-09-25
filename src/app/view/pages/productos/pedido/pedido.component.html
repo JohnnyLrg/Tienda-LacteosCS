@@ -5,147 +5,136 @@
         </div>
 
         <div class="row">
-
-            <form class="col-8 formPedido" (ngSubmit)="registrarPedido(pedidoForm)" #pedidoForm="ngForm">
+            <!-- Vista simplificada para usuarios autenticados -->
+            <div *ngIf="currentUser" class="col-8 formPedido">
                 <h2>Finalizar Compra</h2>
-                <p>Revisa y completa tus datos para finalizar tu pedido.</p>
-                <div class="mb-4">
-                    <div class="input-group ">
-                        <span class="input-group-text" id="basic-addon1">Dni</span>
-                        <input type="text" class="form-control" id="dni" name="dni" ngModel pattern="^[0-9]*$"
-                            minlength="8" maxlength="8" aria-label="Username" aria-describedby="basic-addon1" required>
-                        <button class="btnBuscarDni" type="button" (click)="buscarCliente(pedidoForm)">
-                            <svg width="17" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" role="img"
-                                aria-labelledby="search">
-                                <path
-                                    d="M7.667 12.667A5.333 5.333 0 107.667 2a5.333 5.333 0 000 10.667zM14.334 14l-2.9-2.9"
-                                    stroke="currentColor" stroke-width="1.333" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                </path>
-                            </svg>
+                
+                <!-- Datos del cliente (siempre mostrados para usuarios autenticados) -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user me-2"></i>
+                            Datos de Facturación
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Nombre:</strong> {{ getUserDisplayData().nombre }}</p>
+                                <p><strong>DNI:</strong> {{ getUserDisplayData().dni }}</p>
+                                <p><strong>Email:</strong> {{ getUserDisplayData().email }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Teléfono:</strong> {{ getUserDisplayData().telefono }}</p>
+                                <p><strong>Dirección:</strong> {{ getUserDisplayData().direccion }}</p>
+                            </div>
+                        </div>
+                        <div class="text-muted small">
+                            <i class="fas fa-edit me-1"></i>
+                            ¿Necesitas actualizar tus datos? Ve a <a routerLink="/customer-profile" class="text-primary">Mi Perfil</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Método de pago -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-credit-card me-2"></i>
+                            Método de Pago
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="radio-inputs">
+                            <label *ngFor="let forma of formasPago">
+                                <input class="radio-input" type="radio" name="metodoPago" [value]="forma.Formas_PagoCodigo" [(ngModel)]="selectedPaymentMethod" required>
+                                <span class="radio-tile">
+                                    <i class="fas" [ngClass]="{
+                                        'fa-money-bill': forma.Formas_Pagonombre.toLowerCase().includes('efectivo'),
+                                        'fa-credit-card': forma.Formas_Pagonombre.toLowerCase().includes('tarjeta'),
+                                        'fa-university': forma.Formas_Pagonombre.toLowerCase().includes('transferencia'),
+                                        'fa-wallet': !forma.Formas_Pagonombre.toLowerCase().includes('efectivo') && !forma.Formas_Pagonombre.toLowerCase().includes('tarjeta') && !forma.Formas_Pagonombre.toLowerCase().includes('transferencia')
+                                    }" class="me-2"></i>
+                                    <span class="radio-label">{{ forma.Formas_Pagonombre }}</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div *ngIf="!selectedPaymentMethod && showPaymentError" class="text-danger mt-2">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            Por favor, selecciona un método de pago
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón de pago -->
+                <button class="btn btn-success btn-lg w-100 mb-3" (click)="procesarPago()">
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    Pagar Ahora - S/. {{ calcularTotal() }}
+                </button>
+                
+                <div class="text-center">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        Tu información está protegida y segura
+                    </small>
+                </div>
+            </div>
+
+            <!-- Vista para usuarios no autenticados: redirigir al login -->
+            <div *ngIf="!currentUser" class="col-8 formPedido">
+                <div class="alert alert-warning text-center" role="alert">
+                    <i class="fas fa-lock fa-3x mb-3"></i>
+                    <h4>Inicia sesión para continuar</h4>
+                    <p>Necesitas una cuenta para finalizar tu compra</p>
+                    <div class="d-flex gap-3 justify-content-center">
+                        <button class="btn btn-primary" (click)="goToLogin()">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Iniciar Sesión
+                        </button>
+                        <button class="btn btn-outline-primary" (click)="goToRegister()">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Crear Cuenta
                         </button>
                     </div>
-                    <div *ngIf="pedidoForm.controls['dni']?.errors?.['pattern']" class="text-danger">El DNI debe
-                        contener
-                        solo números.</div>
-                    <div *ngIf="(pedidoForm.controls['dni']?.errors?.['minlength'] || pedidoForm.controls['dni']?.errors?.['maxlength']) && pedidoForm.controls['dni'].touched"
-                        class="text-danger">El DNI debe tener exactamente 8 caracteres.</div>
-                    <div *ngIf="pedidoForm.controls['dni']?.errors?.['required'] && pedidoForm.controls['dni'].touched"
-                        class="text-danger">El DNI es obligatorio.</div>
                 </div>
-                <div class="mb-4">
-                    <div class="input-group">
-                        <span class="input-group-text">Nombres</span>
-                        <input type="text" id="nombre" name="nombre" aria-label="nombres" class="form-control" ngModel
-                            required>
-                        <span class="input-group-text ms-2 " id="basic-addon1">Apellido</span>
-                        <input type="text" id="apellido" name="apellido" aria-label="apellidos" class="form-control"
-                            ngModel required appPopover="Por favor, ingrese su apellido." title="Campo obligatorio">
+            </div>
+            <!-- Resumen de la compra -->
+            <div class="col-4">
+                <div class="card CompraResumen">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            Resumen de Compra
+                        </h5>
                     </div>
-                    <div *ngIf="pedidoForm.controls['nombre']?.errors?.['required'] && pedidoForm.controls['nombre'].touched"
-                        class="text-danger">Ingrese su nombre</div>
-                    <div *ngIf="pedidoForm.controls['apellido']?.errors?.['required'] && pedidoForm.controls['apellido'].touched"
-                        class="text-danger">Ingrese su apellido</div>
-                </div>
-                <div class="mb-4">
-                    <div class="input-group">
-                        <span class="input-group-text">Dirección</span>
-                        <input type="text" class="form-control" id="direccion" name="direccion" aria-label="direccion"
-                            ngModel required>
-                    </div>
-
-                    <div *ngIf="pedidoForm.controls['direccion']?.errors?.['required'] && pedidoForm.controls['direccion'].touched"
-                        class="text-danger">La dirección es obligatoria.</div>
-                </div>
-                <div class="mb-4">
-                    <div class="input-group">
-                        <span class="input-group-text">Telefono</span>
-                        <input type="tel" class="form-control" id="telefono" name="telefono" aria-label="telefono"
-                            ngModel pattern="^[0-9]*$" minlength="9" required>
-                    </div>
-                    <div *ngIf="pedidoForm.controls['telefono']?.errors?.['pattern']" class="text-danger">El teléfono
-                        debe contener solo números.</div>
-                    <div *ngIf="pedidoForm.controls['telefono']?.errors?.['minlength']" class="text-danger">El teléfono
-                        debe tener al menos 9 caracteres.</div>
-                    <div *ngIf="pedidoForm.controls['telefono']?.errors?.['required'] && pedidoForm.controls['telefono'].touched"
-                        class="text-danger">El teléfono es obligatorio.</div>
-                </div>
-                <div class="mb-4">
-                    <div class="input-group">
-                        <span class="input-group-text">Email</span>
-                        <input type="email" class="form-control" id="correo" name="correo" aria-label="correo" ngModel
-                            required email>
-                    </div>
-
-                    <div *ngIf="pedidoForm.controls['correo']?.errors?.['email']" class="text-danger">El email no es
-                        válido.</div>
-                    <div *ngIf="pedidoForm.controls['correo']?.errors?.['required'] && pedidoForm.controls['correo'].touched"
-                        class="text-danger">El email es obligatorio.</div>
-                </div>
-
-                <div class="input-group mb-4 d-flex flex-column">
-                    <span>Metodo de pago:</span>
-                    <div class="grupoBotones mt-3">
-                        <!-- <button>Tarjeta</button>
-                        <button>Transferencia</button> -->
-
-                        <div class="radio-inputs">
-                            <label>
-                                <input class="radio-input" type="radio" name="metodoPago" value="1" ngModel>
-                                <span class="radio-tile">
-                                    <span class="radio-label">Tarjeta</span>
-                                </span>
-                            </label>
-                            <label>
-                                <input class="radio-input" type="radio" name="metodoPago" value="2" ngModel>
-                                <span class="radio-tile">
-                                    <span class="radio-label">Transferencia</span>
-                                </span>
-                            </label>
-                            <!-- <label>
-                                <input class="radio-input" type="radio" name="engine">
-                                <span class="radio-tile">
-                                    <span class="radio-label">Car</span>
-                                </span>
-                            </label> -->
-                        </div>
-                        <div *ngIf="pedidoForm.controls['metodoPago']?.errors?.['required'] && pedidoForm.controls['metodoPago'].touched"
-                            class="text-danger">Seleccione un método de pago.</div>
-                    </div>
-                </div>
-                <button class="mt-4 btn-registrarPedido btn btn-primary" type="submit">registrar</button>
-
-            </form>
-            <div class="CompraResumen col">
-                <div class="offcanvas-body">
-                    @for (producto of productosCarrito; track $index) {
-                    <h5>{{producto.ProductoNombre}}</h5>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex">
-                            <div class="imagenProducto">
-                                <img class="imgProductos" [src]="producto.ProductoFoto" alt="producto">
-                            </div>
-                            <div>
-                                <p>{{producto.ProductoDescripcion}}</p>
-                                <div class="d-flex align-items-center price">
-                                    <!-- <p class="precioPro"> S/. {{ producto.ProductoPrecio }}</p> -->
-                                    <p class="fw-bold">Cantidad: {{ producto.quantity }}</p>
+                    <div class="card-body">
+                        @for (producto of productosCarrito; track $index) {
+                        <div class="mb-3">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <img class="imgProductos" [src]="producto.ProductoFoto" alt="producto" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
                                 </div>
-                                <p>Sub Total: S/.{{ producto.ProductoPrecio * producto.quantity! }}</p>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{producto.ProductoNombre}}</h6>
+                                    <small class="text-muted">{{producto.ProductoDescripcion}}</small>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <span class="fw-bold">Cantidad: {{ producto.quantity }}</span>
+                                        <span class="text-primary fw-bold">S/. {{ (producto.ProductoPrecio * producto.quantity!).toFixed(2) }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        @if ($index < productosCarrito.length - 1) {
+                        <hr class="my-2">
+                        }
+                        }
                     </div>
-                    <hr>
-                    }
-                </div>
-
-                <div class="offcanvas-footer border-top d-flex justify-content-between">
-                    <div class="d-flex  align-items-center ">
-                        <h5 style="margin-right: 50px;" class="offcanvas-title" id="offcanvasExampleLabel"> Total: </h5>
-                        <h5 style="margin-bottom: 0;">S/. {{calcularTotal()}} </h5>
+                    <div class="card-footer bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Total:</h5>
+                            <h4 class="mb-0 text-success fw-bold">S/. {{calcularTotal()}}</h4>
+                        </div>
                     </div>
-                    <!-- <button *ngIf="productosCarrito.length > 0" routerLink="/pedido"
-                        class="Boton-Comprar ">Comprar</button> -->
                 </div>
             </div>
 

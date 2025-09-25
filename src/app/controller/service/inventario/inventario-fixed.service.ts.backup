@@ -34,9 +34,9 @@ export class InventarioService {
     return this.inventario.asObservable();
   }
 
-  // Este endpoint necesitará ser implementado en el backend si no existe
-  modificarInventario(formData: FormData): Observable<any> {
-    return this.http.put(`${BASE_URL}/products/actualizarProducto`, formData);
+  // Método corregido para actualizar producto con ID
+  modificarInventario(productoCodigo: number, formData: FormData): Observable<any> {
+    return this.http.put(`${BASE_URL}/products/actualizarProducto/${productoCodigo}`, formData);
   }
 
   // Este endpoint ya existe en el backend

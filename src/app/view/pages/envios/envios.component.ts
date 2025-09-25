@@ -6,6 +6,7 @@ import {
   inject,
 } from '@angular/core';
 import { ClienteInfoService } from '../../../controller/service/pedidos/clienteInfo.service';
+import { ClientesService } from '../../../controller/service/clientes.service';
 import { ClienteInfo } from '../../../model/interface/cliente-info';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -20,6 +21,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export default class EnviosComponent {
   clienteInforService = inject(ClienteInfoService);
+  clientesService = inject(ClientesService);
 
   dni: string = '';
   cdr = inject(ChangeDetectorRef);
@@ -29,38 +31,26 @@ export default class EnviosComponent {
   // MatSnackBar
   ngOnInit(): void {}
   buscarinformacionCliente() {
-    if (this.dni) {
+    if (this.dni && this.dni.length >= 8) {
       console.log('Enviando solicitud con DNI:', this.dni);
-      this.clienteInforService
-        .buscarClienteInfo({ ClienteDni: this.dni } as ClienteInfo)
-        .subscribe(
-          (data) => {
-            console.log('Datos recibidos:', data);
-            if (data) {
-              this.clienteInfo = data;
-              this.cdr.markForCheck();
-            } else {
-              this.clienteInfo = null;         
-              this.snackBar.open('Cliente no encontrado', 'Cerrar', {
-                duration: 3000,
-                horizontalPosition: 'center'
-              });
-          
-              this.cdr.markForCheck();
-            }
-          },
-          (error) => {
-            console.error('Error al obtener la información del cliente', error);
-            this.snackBar.open('Ocurrió un error al obtener la información del cliente', 'Cerrar', {
-              duration: 3000,
-              horizontalPosition: 'center'
-            });
-            
-            this.cdr.markForCheck();
-          }
-        );
+      this.clientesService.buscarClientePorDni(this.dni).subscribe({
+        next: (data: ClienteInfo) => {
+          console.log('Datos recibidos:', data);
+          this.clienteInfo = data;
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          console.error('Error al obtener la información del cliente', error);
+          this.clienteInfo = null;
+          this.snackBar.open('No se encontró ningún cliente con el DNI proporcionado', 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'center'
+          });
+          this.cdr.markForCheck();
+        }
+      });
     } else {
-      this.snackBar.open('Por favor ingrese un DNI válido.', 'Cerrar', {
+      this.snackBar.open('Por favor ingrese un DNI válido (mínimo 8 dígitos).', 'Cerrar', {
         duration: 3000,
         horizontalPosition: 'center'
       });

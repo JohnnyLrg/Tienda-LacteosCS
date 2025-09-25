@@ -28,4 +28,8 @@ export class PedidosService {
     const body = { PedidoCodigo: pedidoCodigo, PedidoEstado: estado };
     return this.http.put(`${BASE_URL}/pedido/actualizarEstadoPedido`, body);
   }
+
+  obtenerFormasPago(): Observable<any[]> {
+    return this.http.get<any[]>(`${BASE_URL}/formas-pago/listar`);
+  }
 }

@@ -1,388 +1,328 @@
+/* Página de productos moderna */
 .productos {
-  padding-top: 90px;
-  color: #fff;
-  min-height: 100vh;
+    padding-top: 6rem;
+    color: var(--gray-800);
+    min-height: 100vh;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 1;
 }
 
 .list-product {
-  margin-bottom: 50px;
+    margin-bottom: 4rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-gap: 2rem;
+    padding: 2rem 0;
 }
 
-.imgProductos {
-  width: 280px;
-  border-radius: 15px;
-  height: auto;
-  object-fit: cover;
-}
-
-.tituloProducto {
-  font-size: 25px;
-  font-weight: 600;
-  margin-top: 15px;
-}
-
-
-.form button {
-  border: none;
-  background: none;
-  color: #8b8ba7;
-}
-
-/* styling of whole input container */
-.form {
-  --timing: 0.3s;
-  --width-of-input: 200px;
-  --height-of-input: 40px;
-  --border-height: 2px;
-  --input-bg: #fff;
-  --border-color: #2f2ee9;
-  --border-radius: 30px;
-  --after-border-radius: 1px;
-  position: relative;
-  width: var(--width-of-input);
-  height: var(--height-of-input);
-  margin-bottom: 50px;
-  display: flex;
-  align-items: center;
-  padding-inline: 0.8em;
-  border-radius: var(--border-radius);
-  transition: border-radius 0.5s ease;
-  background: var(--input-bg, #fff);
-}
-
-/* styling of Input */
-.input {
-  font-size: 0.9rem;
-  background-color: transparent;
-  width: 100%;
-  height: 100%;
-  padding-inline: 0.5em;
-  padding-block: 0.7em;
-  border: none;
-}
-
-/* styling of animated border */
-.form:before {
-  content: "";
-  position: absolute;
-  background: var(--border-color);
-  transform: scaleX(0);
-  transform-origin: center;
-  width: 100%;
-  height: var(--border-height);
-  left: 0;
-  bottom: 0;
-  border-radius: 1px;
-  transition: transform var(--timing) ease;
-}
-
-.form:focus-within {
-  border-radius: var(--after-border-radius);
-}
-
-input:focus {
-  outline: none;
-}
-
-.form:focus-within:before {
-  transform: scale(1);
-}
-
-.reset {
-  border: none;
-  background: none;
-  opacity: 0;
-  visibility: hidden;
-}
-
-/* close button shown when typing */
-input:not(:placeholder-shown)~.reset {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* sizing svg icons */
-.form svg {
-  width: 17px;
-  margin-top: 3px;
-}
-
-
-
-
-.form button {
-  border: none;
-  background: none;
-  color: #8b8ba7;
-}
-
-/* styling of whole input container */
-.form {
-  --timing: 0.3s;
-  --width-of-input: 80%;
-  --height-of-input: 40px;
-  --border-height: 2px;
-  --input-bg: #fff;
-  --border-color: #2f2ee9;
-  --border-radius: 30px;
-  --after-border-radius: 1px;
-  position: relative;
-  width: var(--width-of-input);
-  height: var(--height-of-input);
-  display: flex;
-  align-items: center;
-  padding-inline: 0.8em;
-  border-radius: var(--border-radius);
-  transition: border-radius 0.5s ease;
-  background: var(--input-bg, #fff);
-}
-
-/* styling of Input */
-.input {
-  font-size: 0.9rem;
-  background-color: transparent;
-  width: 100%;
-  height: 100%;
-  padding-inline: 0.5em;
-  padding-block: 0.7em;
-  border: none;
-}
-
-/* styling of animated border */
-.form:before {
-  content: "";
-  position: absolute;
-  background: var(--border-color);
-  transform: scaleX(0);
-  transform-origin: center;
-  width: 100%;
-  height: var(--border-height);
-  left: 0;
-  bottom: 0;
-  border-radius: 1px;
-  transition: transform var(--timing) ease;
-}
-
-/* Hover on Input */
-.form:focus-within {
-  border-radius: var(--after-border-radius);
-}
-
-input:focus {
-  outline: none;
-}
-
-/* here is code of animated border */
-.form:focus-within:before {
-  transform: scale(1);
-}
-
-/* styling of close button */
-/* == you can click the close button to remove text == */
-.reset {
-  border: none;
-  background: none;
-  opacity: 0;
-  visibility: hidden;
-}
-
-/* close button shown when typing */
-input:not(:placeholder-shown)~.reset {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* sizing svg icons */
-.form svg {
-  width: 17px;
-  margin-top: 3px;
-}
-
-/* .wrapper {
-  height: 30px;
-  min-width: 100px;
-  max-width: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  color: #000;
-  border-radius: 12px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0 , 0.2);
-  margin-right: 10px;
-  margin-left: 10px;
-}
-
-.wrapper span {
-  width: 100%;
-  text-align: center;
-  font-size: 25px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.wrapper span.num{
-  font-size: 20px;
-  border-right: 2px solid rgba(0, 0, 0 , 0.2);
-  border-left: 2px solid rgba(0, 0, 0 , 0.2);
-  pointer-events: none;
-} */
-
-
-
-.list-product {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  /* Grid de columnas autoajustables */
-  grid-gap: 30px;
-  /* Margen entre las columnas */
-}
-
+/* Tarjetas de productos modernas */
 .list-product .box {
-  background-color: #15151538;
-  border-radius: 20px;
-  padding: 20px;
-  transition: all 0.2s;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.list-product .box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.5s;
+}
+
+.list-product .box:hover::before {
+    left: 100%;
 }
 
 .list-product .box:hover {
-  transform: scale(1.007);
-  box-shadow: 0 0 15px 0 rgba(255, 255, 255, 0.505);
-
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary-color);
 }
 
 .list-product .box img {
-  height: 180px;
-  width: 250px;
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 1rem;
+    transition: all 0.3s ease;
 }
 
+.list-product .box:hover img {
+    transform: scale(1.05);
+}
+
+.imgProductos {
+    width: 100%;
+    border-radius: 1rem;
+    height: 200px;
+    object-fit: cover;
+}
+
+.tituloProducto {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    color: var(--gray-800);
+    font-family: 'Roboto Slab', serif;
+}
+
+/* Buscador moderno */
+.form {
+    --timing: 0.3s;
+    --width-of-input: 100%;
+    --height-of-input: 3rem;
+    --border-height: 2px;
+    --input-bg: rgba(255, 255, 255, 0.95);
+    --border-color: var(--primary-color);
+    --border-radius: 1rem;
+    --after-border-radius: 1rem;
+    position: relative;
+    width: var(--width-of-input);
+    height: var(--height-of-input);
+    margin-bottom: 3rem;
+    display: flex;
+    align-items: center;
+    padding-inline: 1.5rem;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+    background: var(--input-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    margin: 0 auto 3rem auto;
+}
+
+.input {
+    font-size: 1rem;
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+    padding-inline: 1rem;
+    padding-block: 0.75rem;
+    border: none;
+    color: var(--gray-700);
+    font-weight: 500;
+}
+
+.input::placeholder {
+    color: var(--gray-400);
+}
+
+.form:before {
+    content: "";
+    position: absolute;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    transform: scaleX(0);
+    transform-origin: center;
+    width: 100%;
+    height: var(--border-height);
+    left: 0;
+    bottom: 0;
+    border-radius: 1px;
+    transition: transform var(--timing) ease;
+}
+
+.form:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.input:focus {
+    outline: none;
+}
+
+.form:focus-within:before {
+    transform: scale(1);
+}
+
+.reset {
+    border: none;
+    background: none;
+    opacity: 0;
+    visibility: hidden;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reset:hover {
+    color: var(--error-color);
+}
+
+input:not(:placeholder-shown) ~ .reset {
+    opacity: 1;
+    visibility: visible;
+}
+
+.form svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--gray-500);
+}
+
+.form button {
+    border: none;
+    background: none;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.form button:hover {
+    color: var(--primary-color);
+}
+
+/* Iconos de acción modernos */
 .iconos a {
-
-  width: 40px;
-  height: 40px;
-  border-radius: 10%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 30px;
-  color: #eee;
-  cursor: pointer;
-  margin-right: 10px;
-  margin-left: 10px;
-  transition: all .1s;
-
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: var(--gray-600);
+    cursor: pointer;
+    margin: 0.25rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.iconos .btn-carrito :active {
-  /* transform: scale(1.2); */
-  color: #0aa850;
+.iconos a:hover {
+    transform: scale(1.1);
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
-
+.iconos .btn-carrito:active {
+    transform: scale(0.95);
+}
 
 .iconos .corazon {
-  color: red;
+    color: var(--error-color);
 }
 
-
-
-
-
-/* imput */
-
-
-input[type="number"] {
-  -webkit-appearance: textfield;
-  -moz-appearance: textfield;
-  appearance: textfield;
+.iconos .corazon:hover {
+    background: var(--error-color);
+    color: white;
 }
 
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-}
-
+/* Input numérico moderno */
 .number-input {
-  border: 2px solid #ddd;
-  display: inline-flex;
-  border-radius: 25px;
+    border: 2px solid var(--gray-300);
+    display: inline-flex;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    transition: all 0.3s ease;
 }
 
-.number-input,
-.number-input * {
-  box-sizing: border-box;
-
-}
-
-.quantity:focus {
-  outline: none;
-  /* Quita el borde de enfoque */
+.number-input:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .number-input button {
-  outline: none;
-  -webkit-appearance: none;
-  background-color: transparent;
-  border: none;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  width: 2rem;
-  height: 2rem;
-  cursor: pointer;
-  margin: 0;
-  position: relative;
+    outline: none;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border: none;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    width: 2.5rem;
+    height: 2.5rem;
+    cursor: pointer;
+    margin: 0;
+    position: relative;
+    transition: all 0.2s ease;
+    font-weight: 600;
 }
 
-/* .number-input button:after {
-  color: #fff;
-  display: inline-block;
-  position: absolute;
-  font-family: "Font Awesome 5 Free"; 
-  font-weight: 900;
-  content: '';
-  transform: translate(-50%, -50%) rotate(180deg);
+.number-input button:hover {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    transform: scale(1.05);
 }
-.number-input button.plus:after {
-  transform: translate(-50%, -50%) rotate(0deg);
-} */
+
+.number-input button:active {
+    transform: scale(0.95);
+}
 
 .number-input input[type=number] {
-  font-family: sans-serif;
-  max-width: 3rem;
-  padding: .3rem;
-  border: solid #ddd;
-  border-width: 0 2px;
-  font-size: 20px;
-  height: 2rem;
-  font-weight: bold;
-  text-align: center;
+    font-family: 'Inter', sans-serif;
+    max-width: 4rem;
+    padding: 0.5rem;
+    border: none;
+    font-size: 1.125rem;
+    height: 2.5rem;
+    font-weight: 600;
+    text-align: center;
+    background: transparent;
+    color: var(--gray-800);
 }
 
-/* AGOTADO CINTA ROJA  */
+.quantity:focus {
+    outline: none;
+}
 
+/* Cinta de agotado moderna */
 .ribbon-wrapper {
-  position: absolute;
-  top: -4px;
-  right: -3px;
-  overflow: hidden;
-  width: 114px;
-  height: 104px;
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    overflow: hidden;
+    width: 120px;
+    height: 120px;
+    pointer-events: none;
 }
 
 .ribbon {
-  font-size: 15px;
-  font-weight: 700;
-  color: white;
-  text-transform: uppercase;
-  text-align: center;
-  line-height: 16px;
-  transform: rotate(45deg);
-  position: relative;
-  padding: 6px 0px;
-  left: 1px;
-  top: 28px;
-  width: 149px;
-  background-color: red;
-  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.2;
+    transform: rotate(45deg);
+    position: relative;
+    padding: 0.5rem 0;
+    left: 2px;
+    top: 32px;
+    width: 160px;
+    background: linear-gradient(135deg, var(--error-color), #dc2626);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .productos {
+        padding-top: 4rem;
+    }
+    
+    .list-product {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-gap: 1.5rem;
+        padding: 1rem;
+    }
+    
+    .form {
+        margin-bottom: 2rem;
+        max-width: 100%;
+    }
 }

@@ -48,6 +48,110 @@
             </div>
         </div>
     }@else {
-        <app-envios></app-envios>
+        <div class="container mt-4">
+  <h2 class="text-center mb-4">Buscar Cliente por DNI</h2>
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <div class="form-group mb-3">
+            <label for="dniInput" class="form-label">Ingrese el DNI del cliente:</label>
+            <input 
+              id="dniInput" 
+              type="text" 
+              class="form-control" 
+              placeholder="Ej: 72801397"
+              [(ngModel)]="dniBusqueda"
+              (keyup.enter)="buscarClientePorDni()"
+            >
+          </div>
+          <div class="d-flex gap-2">
+            <button 
+              type="button" 
+              class="btn btn-primary flex-fill" 
+              (click)="buscarClientePorDni()"
+              [disabled]="!dniBusqueda || dniBusqueda.length < 8"
+            >
+              Buscar
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              (click)="limpiarBusqueda()"
+            >
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resultados de la búsqueda -->
+  <div *ngIf="clienteBuscado" class="mt-4">
+    <h3 class="text-center">Información del Cliente</h3>
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">{{ clienteBuscado.ClienteNombre }} {{ clienteBuscado.ClienteApellidos }}</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <p><strong>DNI:</strong> {{ clienteBuscado.ClienteDni }}</p>
+                <p><strong>Email:</strong> {{ clienteBuscado.ClienteEmail }}</p>
+                <p><strong>Teléfono:</strong> {{ clienteBuscado.ClienteTelefono }}</p>
+              </div>
+              <div class="col-md-6">
+                <p><strong>Dirección:</strong> {{ clienteBuscado.ClienteDireccion }}</p>
+                <p><strong>Total de Pedidos:</strong> {{ clienteBuscado.Pedidos.length || 0 }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historial de Pedidos -->
+    <div *ngIf="clienteBuscado.Pedidos && clienteBuscado.Pedidos.length > 0" class="mt-4">
+      <h4 class="text-center">Historial de Pedidos</h4>
+      <div class="row">
+        <div *ngFor="let pedido of clienteBuscado.Pedidos" class="col-md-6 mb-3">
+          <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span><strong>Pedido #{{ pedido.PedidoCodigo }}</strong></span>
+              <span class="badge" 
+                    [class.bg-warning]="pedido.PedidoEstado === 'Pendiente'"
+                    [class.bg-success]="pedido.PedidoEstado === 'Entregado'"
+                    [class.bg-danger]="pedido.PedidoEstado === 'Cancelado'">
+                {{ pedido.PedidoEstado }}
+              </span>
+            </div>
+            <div class="card-body">
+              <p><strong>Fecha:</strong> {{ pedido.Pedidofecha }}</p>
+              <p><strong>Total:</strong> S/. {{ pedido.Pedidototal }}</p>
+              <div *ngIf="pedido.Detalles && pedido.Detalles.length > 0">
+                <h6>Productos:</h6>
+                <ul class="list-unstyled">
+                  <li *ngFor="let detalle of pedido.Detalles" class="small">
+                     {{ detalle.ProductoNombre }} ({{ detalle.DetallePedidoCantidad }}x) - S/. {{ detalle.DetallePedidoSubtotal }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje cuando no se encuentra el cliente -->
+  <div *ngIf="mensajeBusqueda" class="mt-4">
+    <div class="alert alert-info text-center">
+      {{ mensajeBusqueda }}
+    </div>
+  </div>
+</div>
     }
 </div>

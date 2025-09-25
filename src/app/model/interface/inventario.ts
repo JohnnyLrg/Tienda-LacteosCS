@@ -5,11 +5,11 @@ export interface Inventario {
   ProductoPrecio: number;
   ProductoCantidad: number;
   ProductoFoto: string;
-  Categoria: string; 
-  Producto_TipoProductoCodigo: number; 
-}
-
-export interface InventoryHistory {
+  ProductoEstado: string; // 'V' para Vigente, 'D' para Descontinuado
+  Categoria: string;
+  CategoriaNombre: string; // Nombre de la categoría que viene del backend
+  Producto_TipoProductoCodigo: number;
+}export interface InventoryHistory {
   ProductoCodigo: number;
   ProductoNombre: string;
   CampoModificado: string;

@@ -10,21 +10,23 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 // export const BASE_URL = 'http://192.168.0.100:8080';
 export const BASE_URL = 'http://localhost:8080';
 
+// Configuración Firebase para EMPLEADOS/ADMINISTRADORES
+export const employeeFirebaseConfig = {
+  apiKey: "AIzaSyAfA8VgjgVF7wr-TgmXTloyUcqxo8EaJXw",
+  authDomain: "calidadusuariosempleados.firebaseapp.com",
+  projectId: "calidadusuariosempleados",
+  storageBucket: "calidadusuariosempleados.firebasestorage.app",
+  messagingSenderId: "151722857160",
+  appId: "1:151722857160:web:a33bf76de3b343ed36cbfd"
+};
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
 
     importProvidersFrom(HttpClientModule),
-    provideFirebaseApp(() =>
-      initializeApp({
-        projectId: 'loginlacteos',
-        appId: '1:653223671625:web:1f762a68ce989f8d63cc98',
-        storageBucket: 'loginlacteos.appspot.com',
-        apiKey: 'AIzaSyCxw2PnP4tEAHhQ279RzELbbN75YrQKysE',
-        authDomain: 'loginlacteos.firebaseapp.com',
-        messagingSenderId: '653223671625',
-      })
-    ),
+    // Firebase para empleados/administradores (configuración principal)
+    provideFirebaseApp(() => initializeApp(employeeFirebaseConfig)),
     provideAuth(() => getAuth()), provideAnimationsAsync(),
   ],
 };

@@ -5,3 +5,11 @@ app-nav-bar {
   width: 100%;
   z-index: 1000; /* Asegúrate de que este valor sea mayor que el z-index de otros elementos */
 }
+
+/* Asegurar que el contenido principal pueda hacer scroll */
+.main-content {
+  padding-top: 80px; /* Compensar el navbar fijo */
+  min-height: 100vh;
+  overflow-y: auto;
+  position: relative;
+}

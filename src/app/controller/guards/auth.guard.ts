@@ -28,7 +28,7 @@ export const publicGuard: CanActivateFn = () => {
     map((user) => {
       if(user){
         router.navigateByUrl('/Empresa');
-        console.log("usuario esistente", user)
+        console.log("usuario existente", user)
         return false;
       }
       return true

@@ -4,7 +4,6 @@ import { RouterModule } from '@angular/router';
 import { NavBarComponent } from '../../shared/nav-bar/nav-bar.component';
 import { ProductosService } from '../../../controller/service/productos.service';
 import { FooterComponent } from '../../shared/footer/footer.component';
-import { FloatingButtonComponent } from '../../shared/floating-button/floating-button.component';
 
 @Component({
   selector: 'app-principal',
@@ -13,8 +12,7 @@ import { FloatingButtonComponent } from '../../shared/floating-button/floating-b
     CommonModule,
     RouterModule,
     NavBarComponent,
-    FooterComponent,
-    FloatingButtonComponent
+    FooterComponent
   ],
   templateUrl: './principal.component.html',
   styleUrl: './principal.component.css',

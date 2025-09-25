@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     <div class="footer">
       <!-- <div class=" titulo d-flex align-items-center justify-content-center">
         <div >
-          <h1>Tienda delacteos San Jose de porcon</h1>
+          <h1>Sistema Comercial</h1>
         </div>
         <div>
           <p>
@@ -22,12 +22,12 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       </div> -->
 
       <div class="row">
-        <h5>Asociacion de productores:</h5>
-        <p>Descubre la frescura y calidad de nuestros productos lácteos, hechos con el mayor cuidado para ofrecerte el mejor sabor y nutrición.</p>
+        <h5>Sistema Comercial:</h5>
+        <p>Descubre la calidad y variedad de nuestros productos comerciales, seleccionados con el mayor cuidado para ofrecerte la mejor experiencia de compra.</p>
       </div>
 
       <div class="text-center">
-        Asociacion de productores Copyright © 2024 - Derechos reservados || Grupo 1 ing. sofware
+        Sistema Comercial Copyright © 2024 - Derechos reservados || Grupo 1 ing. sofware
       </div>
     </div>
   </footer>`,

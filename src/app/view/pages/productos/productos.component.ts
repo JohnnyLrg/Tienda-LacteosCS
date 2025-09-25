@@ -15,8 +15,7 @@ import { CarritoServiceService } from '../../../controller/service/carrito/Carri
     CommonModule,
     FontAwesomeModule,
     FormsModule,
-    ReactiveFormsModule,
-    AsyncPipe
+    ReactiveFormsModule
   ],
   templateUrl: './productos.component.html',
   styleUrl: './productos.component.css',

@@ -38,12 +38,9 @@ export default class InventarioComponent implements OnInit {
   selectedProduct: Inventario | null = null;
   categorias: Categoria[] = [];
   currentImage: string | null = null;
-  newImagePreview: string | null = null;
-  selectedImageFile: File | null = null;
 
   productosFiltrados: Inventario[] = [];
   filterProperty: string = '';
-  estadoActual: string = 'V'; // Estado actual del filtro: 'V' para Vigentes, 'D' para Descontinuados
 
   alertMessage: string | null = null;
   constructor(
@@ -81,8 +78,14 @@ export default class InventarioComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.cargarProductosPorEstado('V'); // Cargar productos vigentes por defecto
+    this.inventarioService.actualizarInventario();
     this.cargarCategorias();
+
+    this.inventarioService.obtenerInventario().subscribe((inventario) => {
+      this.productosFiltrados = inventario; // Inicializar con todos los productos
+      this.cdr.markForCheck();
+    });
+    // this.inventario = this._servicioInvetario.obtenerInventario();
   }
 
   onFileChange(event: any) {
@@ -102,31 +105,15 @@ export default class InventarioComponent implements OnInit {
   onEditFileChange(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // Validar tipo de archivo
-      if (!file.type.startsWith('image/')) {
-        this.snackBar.open('Por favor selecciona un archivo de imagen válido', 'Cerrar', {
-          duration: 3000,
-          panelClass: ['error-snackbar']
-        });
-        return;
-      }
-
-      // Validar tamaño de archivo (5MB máximo)
-      if (file.size > 5 * 1024 * 1024) {
-        this.snackBar.open('La imagen es muy grande. Máximo 5MB permitido.', 'Cerrar', {
-          duration: 3000,
-          panelClass: ['error-snackbar']
-        });
-        return;
-      }
-
-      this.selectedImageFile = file;
       const reader = new FileReader();
       reader.onload = () => {
-        this.newImagePreview = reader.result as string;
-        this.cdr.markForCheck();
+        this.currentImage = reader.result as string;
       };
       reader.readAsDataURL(file);
+      
+      this.editProductForm.patchValue({
+        ProductoFoto: file,
+      });
     }
   }
 
@@ -140,25 +127,6 @@ export default class InventarioComponent implements OnInit {
         console.error('Error al cargar categorías:', error);
       }
     );
-  }
-
-  // NUEVO: Método para cargar productos por estado
-  cargarProductosPorEstado(estado: string): void {
-    this.estadoActual = estado;
-    
-    // Usar directamente el endpoint de inventario admin
-    this.inventarioService.cargarInventarioAdmin(estado).subscribe((inventario) => {
-      this.productosFiltrados = inventario;
-      this.cdr.markForCheck();
-    }, (error) => {
-      console.error('Error al cargar productos por estado:', error);
-    });
-  }
-
-  // NUEVO: Método para cambiar entre estados
-  cambiarEstado(estado: string): void {
-    this.cargarProductosPorEstado(estado);
-    this.filterProperty = ''; // Limpiar filtro de búsqueda
   }
 
   trackByFn(index: number, item: Inventario) {
@@ -230,7 +198,8 @@ export default class InventarioComponent implements OnInit {
     this.inventarioService.agregarProducto(formData).subscribe(
       (response) => {
         console.log('Producto agregado:', response);
-        this.cargarProductosPorEstado(this.estadoActual); // Recargar productos del estado actual
+        this.inventarioService.actualizarInventario();
+        this.cdr.markForCheck();
         this.productForm.reset();
         this.resetFileInput();
         alert('Producto agregado')
@@ -254,8 +223,9 @@ export default class InventarioComponent implements OnInit {
       formData.append('Producto_TipoProductoCodigo', this.editProductForm.get('Producto_TipoProductoCodigo')?.value);
       
       // Solo agregar imagen si se seleccionó una nueva
-      if (this.selectedImageFile) {
-        formData.append('image', this.selectedImageFile);
+      const imageFile = this.editProductForm.get('ProductoFoto')?.value;
+      if (imageFile) {
+        formData.append('image', imageFile);
       }
       
       // Llamar al servicio con el ProductoCodigo y FormData
@@ -264,10 +234,8 @@ export default class InventarioComponent implements OnInit {
         .subscribe(
           (response) => {
             console.log('Producto actualizado:', response);
-            this.cargarProductosPorEstado(this.estadoActual); // Recargar productos del estado actual
-            // Limpiar vista previa y archivo seleccionado
-            this.newImagePreview = null;
-            this.selectedImageFile = null;
+            this.inventarioService.actualizarInventario();
+            this.cdr.markForCheck();
             this.snackBar.open('¡El producto se actualizó correctamente!', 'Cerrar', {
               duration: 3000,
               horizontalPosition: 'end'
@@ -293,8 +261,6 @@ export default class InventarioComponent implements OnInit {
   editItem(item: Inventario): void {
     this.selectedProduct = item;
     this.currentImage = item.ProductoFoto;
-    this.newImagePreview = null; // Limpiar vista previa anterior
-    this.selectedImageFile = null; // Limpiar archivo seleccionado anterior
     this.setEditFormValues(item);
     document.getElementById('editModal')?.click();
   }
@@ -305,7 +271,7 @@ export default class InventarioComponent implements OnInit {
       ProductoDescripcion: item.ProductoDescripcion,
       ProductoPrecio: item.ProductoPrecio,
       ProductoCantidad: item.ProductoCantidad,
-      Producto_TipoProductoCodigo: this.getCategoriaCodigo(item.CategoriaNombre),
+      Producto_TipoProductoCodigo: this.getCategoriaCodigo(item.Categoria),
       ProductoFoto: null, // No establecer la foto aquí para evitar sobreescribirla
     });
   }
@@ -317,19 +283,12 @@ export default class InventarioComponent implements OnInit {
   }
 
   filtrarProductos() {
-    if (!this.filterProperty.trim()) {
-      // Si no hay filtro de búsqueda, cargar todos los productos del estado actual
-      this.cargarProductosPorEstado(this.estadoActual);
-    } else {
-      // Filtrar por nombre dentro del estado actual
-      this.inventarioService.cargarInventarioAdmin(this.estadoActual).subscribe((inventario) => {
-        this.productosFiltrados = inventario.filter((producto) =>
-          producto.ProductoNombre.toLowerCase().includes(
-            this.filterProperty.toLowerCase()
-          )
-        );
-        this.cdr.markForCheck();
-      });
-    }
+    this.inventarioService.obtenerInventario().subscribe((inventario) => {
+      this.productosFiltrados = inventario.filter((producto) =>
+        producto.ProductoNombre.toLowerCase().includes(
+          this.filterProperty.toLowerCase()
+        )
+      );
+    });
   }
 }
